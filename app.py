@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 import pickle
+import os
 
 # Menampilkan nama dan NIM
 st.title("Prediksi Pembayaran Premi Asuransi")
@@ -22,11 +23,19 @@ if submit:
     X = np.array([age, sex, bmi, children, smoker])
     X = X.reshape(1, -1)
 
-    # Memuat model yang telah disimpan dengan pickle
-    loaded_model = pickle.load(open('model_uas.pkl', 'rb'))
+    # Menentukan path absolut untuk file model
+    model_path = os.path.join(os.path.dirname(__file__), 'model_uas.pkl')
 
-    # Melakukan prediksi
-    charge_pred = loaded_model.predict(X)
+    try:
+        # Memuat model yang telah disimpan dengan pickle
+        loaded_model = pickle.load(open(model_path, 'rb'))
 
-    # Menampilkan hasil prediksi
-    st.write(f"Prediksi Pembayaran Premi Asuransi: ${charge_pred[0]:,.2f}")
+        # Melakukan prediksi
+        charge_pred = loaded_model.predict(X)
+
+        # Menampilkan hasil prediksi
+        st.write(f"Prediksi Pembayaran Premi Asuransi: ${charge_pred[0]:,.2f}")
+    except FileNotFoundError:
+        st.error("File model_uas.pkl tidak ditemukan! Pastikan file model ada di direktori yang sama dengan app.py.")
+    except Exception as e:
+        st.error(f"Terjadi kesalahan saat memuat model: {e}")
