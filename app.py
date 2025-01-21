@@ -27,15 +27,23 @@ if submit:
     model_path = os.path.join(os.path.dirname(__file__), 'model_uas.pkl')
 
     try:
+        # Memastikan file model ada sebelum dimuat
+        if not os.path.exists(model_path):
+            raise FileNotFoundError("File model_uas.pkl tidak ditemukan! Pastikan file model ada di direktori yang sama dengan app.py.")
+
         # Memuat model yang telah disimpan dengan pickle
-        loaded_model = pickle.load(open(model_path, 'rb'))
+        with open(model_path, 'rb') as model_file:
+            loaded_model = pickle.load(model_file)
 
         # Melakukan prediksi
         charge_pred = loaded_model.predict(X)
 
         # Menampilkan hasil prediksi
-        st.write(f"Prediksi Pembayaran Premi Asuransi: ${charge_pred[0]:,.2f}")
-    except FileNotFoundError:
-        st.error("File model_uas.pkl tidak ditemukan! Pastikan file model ada di direktori yang sama dengan app.py.")
+        st.success(f"Prediksi Pembayaran Premi Asuransi: ${charge_pred[0]:,.2f}")
+
+    except FileNotFoundError as fnf_error:
+        st.error(fnf_error)
+    except ModuleNotFoundError as mnf_error:
+        st.error("Module scikit-learn tidak ditemukan! Pastikan telah menginstal dependensi dengan `pip install -r requirements.txt`.")
     except Exception as e:
         st.error(f"Terjadi kesalahan saat memuat model: {e}")
