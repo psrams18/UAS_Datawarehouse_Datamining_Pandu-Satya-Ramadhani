@@ -10,18 +10,22 @@ st.write("NIM: 2021230005")
 
 # Input data
 age = st.number_input('Masukkan Umur (Age)', min_value=18, max_value=100, value=27)
-sex = st.radio('Jenis Kelamin (Sex)', options=[0, 1], index=0, help="0: Perempuan, 1: Laki-laki")
+
+sex_dict = {0: "Perempuan", 1: "Laki-laki"}
+sex = st.radio('Jenis Kelamin (Sex)', options=[0, 1], format_func=lambda x: sex_dict[x])
+
 bmi = st.number_input('Masukkan BMI (Body Mass Index)', min_value=10.0, max_value=60.0, value=30.0)
 children = st.number_input('Jumlah Anak (Children)', min_value=0, max_value=5, value=1)
-smoker = st.radio('Perokok (Smoker)', options=[0, 1], index=0, help="0: Tidak Merokok, 1: Merokok")
+
+smoker_dict = {0: "Tidak", 1: "Ya"}
+smoker = st.radio('Perokok (Smoker)', options=[0, 1], format_func=lambda x: smoker_dict[x])
 
 # Membuat tombol submit
 submit = st.button('Submit')
 
 if submit:
     # Menyiapkan data untuk prediksi
-    X = np.array([age, sex, bmi, children, smoker])
-    X = X.reshape(1, -1)
+    X = np.array([age, sex, bmi, children, smoker]).reshape(1, -1)
 
     # Menentukan path absolut untuk file model
     model_path = os.path.join(os.path.dirname(__file__), 'model_uas.pkl')
@@ -43,7 +47,7 @@ if submit:
 
     except FileNotFoundError as fnf_error:
         st.error(fnf_error)
-    except ModuleNotFoundError as mnf_error:
+    except ModuleNotFoundError:
         st.error("Module scikit-learn tidak ditemukan! Pastikan telah menginstal dependensi dengan `pip install -r requirements.txt`.")
     except Exception as e:
         st.error(f"Terjadi kesalahan saat memuat model: {e}")
